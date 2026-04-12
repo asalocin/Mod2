@@ -1,0 +1,73 @@
+% ============================================================
+%  Capítulo 4 — Pruebas de Hipótesis
+% ============================================================
+\section{Pruebas de Hipótesis}
+
+\subsection{Formulación del problema}
+
+\begin{defi}[Hipótesis estadística]
+  Una \textbf{hipótesis estadística} es una afirmación sobre el parámetro
+  $\theta$ (o sobre la distribución de los datos).
+  \begin{itemize}
+    \item $H_0$: hipótesis nula (afirmación que se desea refutar).
+    \item $H_1$ (o $H_a$): hipótesis alternativa.
+  \end{itemize}
+\end{defi}
+
+\subsection{Errores de tipo I y II}
+
+\begin{center}
+\begin{tabular}{lcc}
+  \toprule
+  & $H_0$ verdadera & $H_0$ falsa \\
+  \midrule
+  No rechazar $H_0$ & Decisión correcta & Error tipo II ($\beta$) \\
+  Rechazar $H_0$    & Error tipo I ($\alpha$) & Decisión correcta \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\begin{defi}[Nivel de significación]
+  $\alpha = P(\text{rechazar } H_0 \mid H_0 \text{ verdadera})$.
+  Valores típicos: $0.01,\, 0.05,\, 0.10$.
+\end{defi}
+
+\begin{defi}[Potencia]
+  $\pi(\theta) = P(\text{rechazar } H_0 \mid \theta)$.
+  Para $\theta \in H_1$ se desea que $\pi(\theta)$ sea grande.
+\end{defi}
+
+\subsection{Test de razón de verosimilitudes (TRV)}
+
+\begin{defi}[Estadístico TRV]
+  \[
+    \Lambda(\mathbf{x}) =
+    \frac{\sup_{\theta \in \Theta_0} L(\theta;\mathbf{x})}
+         {\sup_{\theta \in \Theta} L(\theta;\mathbf{x})}.
+  \]
+  Se rechaza $H_0$ cuando $\Lambda(\mathbf{x}) \leq c$ para algún umbral $c$.
+\end{defi}
+
+\begin{teo}[Wilks]
+  Bajo condiciones de regularidad y si $H_0$ es verdadera,
+  \[
+    -2\log\Lambda(\mathbf{X}) \dlim \chi^2_r,
+  \]
+  donde $r = \dim(\Theta) - \dim(\Theta_0)$.
+\end{teo}
+
+\subsection{\texorpdfstring{$p$}{p}-valor}
+
+\begin{defi}[$p$-valor]
+  El $p$-valor es la probabilidad, bajo $H_0$, de observar un estadístico de
+  prueba tan extremo o más que el observado:
+  \[
+    p = P_{H_0}(T(\mathbf{X}) \geq T(\mathbf{x}_{\text{obs}})).
+  \]
+  Se rechaza $H_0$ si $p \leq \alpha$.
+\end{defi}
+
+\begin{resultado}
+  \textbf{Interpretación}: un $p$-valor pequeño es evidencia en contra de
+  $H_0$. No mide la probabilidad de que $H_0$ sea verdadera.
+\end{resultado}

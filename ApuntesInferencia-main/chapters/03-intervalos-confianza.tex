@@ -1,0 +1,57 @@
+% ============================================================
+%  Capítulo 3 — Intervalos de Confianza
+% ============================================================
+\section{Intervalos de Confianza}
+
+\subsection{Definición}
+
+\begin{defi}[Intervalo de confianza]
+  Un \textbf{intervalo de confianza} al nivel $(1-\alpha)$ para $\theta$ es
+  un intervalo aleatorio $[L(\mathbf{X}),\, U(\mathbf{X})]$ tal que
+  \[
+    P_\theta\bigl(L(\mathbf{X}) \leq \theta \leq U(\mathbf{X})\bigr)
+    \geq 1 - \alpha \quad \forall\, \theta \in \Theta.
+  \]
+\end{defi}
+
+\begin{cuidado}
+  El intervalo es \emph{aleatorio}, no el parámetro. Una vez observada la
+  muestra, el intervalo calculado $[l, u]$ o contiene a $\theta$ o no lo
+  contiene; no tiene sentido hablar de probabilidad en ese caso.
+\end{cuidado}
+
+\subsection{IC para la media con varianza conocida}
+
+Sea $X_1,\ldots,X_n \iid \N(\mu, \sigma^2)$ con $\sigma^2$ conocida. Entonces
+\[
+  Z = \frac{\bar{X} - \mu}{\sigma/\sqrt{n}} \sim \N(0,1),
+\]
+y el IC al $(1-\alpha)$ para $\mu$ es
+\[
+  \bar{X} \pm z_{\alpha/2}\,\frac{\sigma}{\sqrt{n}},
+\]
+donde $z_{\alpha/2}$ es el cuantil $1-\alpha/2$ de la $\N(0,1)$.
+
+\subsection{IC para la media con varianza desconocida}
+
+Cuando $\sigma^2$ es desconocida, se reemplaza por $S^2$ y se usa la
+distribución $t$ de Student:
+\[
+  T = \frac{\bar{X} - \mu}{S/\sqrt{n}} \sim t_{n-1}.
+\]
+El IC al $(1-\alpha)$ para $\mu$ es
+\[
+  \bar{X} \pm t_{n-1,\,\alpha/2}\,\frac{S}{\sqrt{n}}.
+\]
+
+\subsection{IC para la varianza}
+
+\[
+  \frac{(n-1)S^2}{\sigma^2} \sim \chi^2_{n-1}
+  \implies
+  IC_{1-\alpha}(\sigma^2) =
+  \left[
+    \frac{(n-1)S^2}{\chi^2_{n-1,\,\alpha/2}},\;
+    \frac{(n-1)S^2}{\chi^2_{n-1,\,1-\alpha/2}}
+  \right].
+\]

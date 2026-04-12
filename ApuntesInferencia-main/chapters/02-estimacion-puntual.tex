@@ -1,0 +1,88 @@
+% ============================================================
+%  Capítulo 2 — Estimación Puntual
+% ============================================================
+\section{Estimación Puntual}
+
+\subsection{Estimadores y sus propiedades}
+
+\begin{defi}[Estimador]
+  Un \textbf{estimador} de $\theta$ es un estadístico $\hat{\theta} =
+  \hat{\theta}(X_1,\ldots,X_n)$ cuyo valor se toma como aproximación del
+  parámetro desconocido $\theta$.
+\end{defi}
+
+\subsubsection{Insesgamiento}
+
+\begin{defi}[Estimador insesgado]
+  $\hat{\theta}$ es \textbf{insesgado} (o no sesgado) para $\theta$ si
+  \[
+    \E_\theta[\hat{\theta}] = \theta \quad \forall\, \theta \in \Theta.
+  \]
+  El \textbf{sesgo} se define como $\Bias(\hat{\theta}) = \E[\hat{\theta}] - \theta$.
+\end{defi}
+
+\begin{ejemplo}
+  Si $X_1,\ldots,X_n \iid (\mu, \sigma^2)$, entonces $\bar{X}$ es insesgado
+  para $\mu$ y $S^2 = \tfrac{1}{n-1}\sum_{i=1}^n (X_i - \bar{X})^2$ es
+  insesgado para $\sigma^2$.
+\end{ejemplo}
+
+\subsubsection{Error cuadrático medio}
+
+\begin{defi}[ECM]
+  El \textbf{error cuadrático medio} de $\hat{\theta}$ es
+  \[
+    \mathrm{ECM}(\hat{\theta}) = \E\bigl[(\hat{\theta} - \theta)^2\bigr]
+    = \Var(\hat{\theta}) + [\Bias(\hat{\theta})]^2.
+  \]
+\end{defi}
+
+\subsubsection{Consistencia}
+
+\begin{defi}[Consistencia]
+  $\hat{\theta}_n$ es \textbf{consistente} para $\theta$ si
+  $\hat{\theta}_n \plim \theta$, es decir,
+  \[
+    \forall\,\varepsilon > 0: \quad
+    P_\theta(|\hat{\theta}_n - \theta| > \varepsilon) \to 0
+    \quad \text{cuando } n \to \infty.
+  \]
+\end{defi}
+
+\begin{resultado}
+  Si $\mathrm{ECM}(\hat{\theta}_n) \to 0$ cuando $n \to \infty$, entonces
+  $\hat{\theta}_n$ es consistente para $\theta$.
+\end{resultado}
+
+\subsection{Métodos de estimación}
+
+\subsubsection{Método de los momentos}
+
+Igualar los $k$ primeros momentos poblacionales con los $k$ primeros momentos
+muestrales y resolver el sistema de ecuaciones resultante en $\theta$.
+
+\subsubsection{Máxima verosimilitud}
+
+\begin{defi}[Función de verosimilitud]
+  Dada una muestra observada $\mathbf{x} = (x_1,\ldots,x_n)$, la
+  \textbf{función de verosimilitud} es
+  \[
+    L(\theta; \mathbf{x}) = \prod_{i=1}^n f(x_i; \theta), \quad \theta \in \Theta.
+  \]
+  El \textbf{estimador de máxima verosimilitud (EMV)} es
+  $\hat{\theta}_{\text{MLE}} = \arg\max_{\theta} L(\theta;\mathbf{x})$.
+\end{defi}
+
+\begin{obs}
+  Normalmente se trabaja con la \emph{log-verosimilitud}
+  $\ell(\theta) = \log L(\theta)$ por conveniencia numérica.
+\end{obs}
+
+\begin{teo}[Propiedades asintóticas del EMV]
+  Bajo condiciones de regularidad, si $n \to \infty$:
+  \[
+    \sqrt{n}(\hat{\theta}_{\text{MLE}} - \theta)
+    \dlim \N\!\bigl(0,\, [I(\theta)]^{-1}\bigr),
+  \]
+  donde $I(\theta)$ es la \textbf{información de Fisher} de una observación.
+\end{teo}
