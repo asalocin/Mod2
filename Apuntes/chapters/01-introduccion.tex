@@ -1,0 +1,1109 @@
+% ============================================================
+%  Capítulo 1 — Introducción a la Inferencia Estadística
+% ============================================================
+
+\section{M. numéricos para ecuaciones lineales}
+
+Consideramos el problema de Cauchy
+\[
+(P)\qquad
+\begin{cases}
+U_t + A U_x = 0, & x \in \mathbb{R},\ t>0,\\[4pt]
+U(x,0)=U_0(x),
+\end{cases}
+\]
+donde
+\[
+U:\mathbb{R}\times \mathbb{R}_+ \to \mathbb{R}^m,
+\qquad
+A\in M_{m\times m}(\mathbb{R}).
+\]
+
+Dado \(U_0\), queremos encontrar \(U=U(x,t)\in \mathbb{R}^m\).
+
+\paragraph{Idea central.}
+La ecuación
+\[
+U_t + A U_x = 0
+\]
+relaciona la variación temporal con la variación espacial. El objetivo de los métodos numéricos será reemplazar las derivadas por cocientes de diferencias en una malla y así obtener una regla algebraica que permita avanzar en el tiempo.
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item La incógnita exacta es una función \(U(x,t)\).
+    \item El dato inicial es \(U_0(x)\).
+    \item La matriz \(A\) determina cómo se propaga la información.
+    \item El problema está planteado en todo \(\mathbb{R}\), por lo que, al menos a este nivel, no hay fronteras laterales físicas.
+\end{itemize}
+
+\subsection{Mallado espacio--temporal}
+
+Introducimos una malla uniforme en espacio y tiempo:
+\[
+x_j = jh, \qquad j\in \mathbb{Z},
+\]
+\[
+t_n = nk, \qquad n=0,1,2,\dots
+\]
+donde
+\begin{itemize}
+    \item \(h>0\) es el paso espacial,
+    \item \(k>0\) es el paso temporal.
+\end{itemize}
+
+También definimos los puntos medios espaciales
+\[
+x_{j+\frac12}=x_j+\frac h2=\left(j+\frac12\right)h.
+\]
+
+Denotamos por
+\[
+U_j^n \in \mathbb{R}^m
+\]
+la aproximación numérica de la solución exacta en el nodo \((x_j,t_n)\), es decir,
+\[
+U_j^n \approx U(x_j,t_n).
+\]
+
+La discretización del dato inicial queda dada por
+\[
+U_j^0 = U_0(x_j).
+\]
+
+\paragraph{Interpretación.}
+El índice \(j\) recorre los puntos del espacio y el índice \(n\) recorre los niveles de tiempo. Por tanto, \(U_j^n\) es el valor numérico en el nodo de la malla ubicado en la posición \(x_j\) y en el instante \(t_n\).
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item \(j\) es índice espacial.
+    \item \(n\) es índice temporal.
+    \item Resolver numéricamente la EDP significa construir los valores \(U_j^n\).
+\end{itemize}
+
+\subsection{Razón de malla}
+
+Frecuentemente se supone que
+\[
+\lambda := \frac{k}{h}
+\]
+permanece constante cuando la malla se refina.
+
+\paragraph{Interpretación.}
+Esta razón compara la escala temporal con la escala espacial. Más adelante será clave en el análisis de estabilidad y convergencia.
+
+\subsection{Función aproximante por pedazos}
+
+A partir de los valores nodales \(U_j^n\), definimos una función aproximante \(U_h(x,t)\), constante por rectángulos de la malla, mediante
+\[
+U_h(x,t)=U_j^n,
+\qquad
+(x,t)\in [x_{j-\frac12},x_{j+\frac12})\times [t_n,t_{n+1}).
+\]
+
+\paragraph{Interpretación.}
+Aunque el método entrega una familia discreta \(\{U_j^n\}\), esta construcción permite asociarle una función definida en todo el plano \((x,t)\). Esto es útil cuando se quiere comparar el método con la solución exacta \(U(x,t)\).
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item \(\{U_j^n\}\) es el objeto discreto.
+    \item \(U_h(x,t)\) es la reconstrucción por pedazos asociada al método.
+    \item La convergencia se estudiará comparando \(U_h\) o \(U_j^n\) con la solución exacta.
+\end{itemize}
+
+\subsection{Métodos de nivel}
+
+Conocida la condición inicial
+\[
+U^0=(U_j^0)_j,
+\]
+un \textbf{método de nivel 2} es aquel en que, conocido \(U^n\), se puede calcular \(U^{n+1}\). Es decir,
+\[
+U^0 \longrightarrow U^1 \longrightarrow U^2 \longrightarrow \cdots
+\]
+
+Más generalmente, un método multinivel usa varios niveles anteriores
+\[
+U^{n-r},U^{n-r+1},\dots,U^n
+\]
+para calcular \(U^{n+1}\).
+
+\paragraph{Interpretación.}
+Aquí \(U^n\) no es un número, sino todo el vector de valores en el tiempo \(t_n\):
+\[
+U^n = (U_j^n)_j.
+\]
+Entonces un método numérico puede verse como una regla que transforma un nivel completo de la malla en el siguiente.
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item Un método de dos niveles usa solo información del tiempo \(n\) para calcular el tiempo \(n+1\).
+    \item Un método de tres niveles, como \emph{leapfrog}, usa dos tiempos anteriores.
+\end{itemize}
+
+\subsection{Discretización explícita centrada}
+
+Aproximamos la derivada temporal por una diferencia hacia adelante:
+\[
+U_t(x_j,t_n)\approx \frac{U_j^{n+1}-U_j^n}{k},
+\]
+y la derivada espacial por una diferencia centrada:
+\[
+U_x(x_j,t_n)\approx \frac{U_{j+1}^n-U_{j-1}^n}{2h}.
+\]
+
+Sustituyendo estas aproximaciones en la ecuación
+\[
+U_t + A U_x =0,
+\]
+obtenemos
+\[
+\frac{U_j^{n+1}-U_j^n}{k}
++
+A\frac{U_{j+1}^n-U_{j-1}^n}{2h}
+=0.
+\]
+
+Equivalentemente,
+\[
+U_j^{n+1}
+=
+U_j^n
+-
+\frac{k}{2h}\,A\left(U_{j+1}^n-U_{j-1}^n\right),
+\qquad
+U_j^0=U_0(x_j).
+\]
+
+\paragraph{Interpretación.}
+Este método usa datos conocidos en el tiempo \(t_n\) para producir directamente el valor en el tiempo \(t_{n+1}\). Por eso se llama \textbf{explícito}.
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item La derivada temporal se discretiza hacia adelante.
+    \item La derivada espacial se discretiza de forma centrada.
+    \item El método es explícito porque \(U_j^{n+1}\) queda despejado.
+\end{itemize}
+
+\subsection{Método implícito}
+
+Una alternativa consiste en evaluar la derivada espacial en el tiempo nuevo \(t_{n+1}\):
+\[
+\frac{U_j^{n+1}-U_j^n}{k}
++
+A\frac{U_{j+1}^{n+1}-U_{j-1}^{n+1}}{2h}
+=0.
+\]
+
+En el caso escalar \(m=1\), con \(A=a\in\mathbb{R}\), se obtiene
+\[
+-\frac{ak}{2h}U_{j-1}^{n+1}
++
+U_j^{n+1}
++
+\frac{ak}{2h}U_{j+1}^{n+1}
+=
+U_j^n.
+\]
+
+\paragraph{Interpretación.}
+Ahora los valores desconocidos del tiempo \(n+1\) aparecen acoplados entre sí. Por eso el método ya no se puede aplicar nodo a nodo de forma directa: en cada paso temporal hay que resolver un sistema lineal.
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item El método implícito suele ser más costoso por paso.
+    \item Su ventaja típica es que puede tener mejores propiedades de estabilidad.
+    \item En dominio truncado, este esquema conduce a una matriz lineal que debe invertirse o resolverse en cada paso temporal.
+\end{itemize}
+
+\subsection{Esténcil}
+
+El \textbf{esténcil} de un método es el conjunto de nodos de la malla que intervienen en la fórmula que calcula \(U_j^{n+1}\).
+
+\paragraph{Interpretación.}
+Mirar el esténcil permite entender de un vistazo qué información usa el método:
+\begin{itemize}
+    \item si usa nodos del nivel \(n\), es explícito;
+    \item si usa nodos del nivel \(n+1\), es implícito;
+    \item si usa niveles \(n-1,n,n+1\), es un método de tres niveles.
+\end{itemize}
+
+\subsection{Métodos de un lado}
+
+Si aproximamos \(U_x\) con una diferencia hacia la derecha, tenemos
+\[
+U_x(x_j,t_n)\approx \frac{U_{j+1}^n-U_j^n}{h},
+\]
+y el esquema queda
+\[
+\frac{U_j^{n+1}-U_j^n}{k}
++
+A\frac{U_{j+1}^n-U_j^n}{h}
+=0.
+\]
+
+Por tanto,
+\[
+U_j^{n+1}
+=
+U_j^n
+-
+\frac{k}{h}A\left(U_{j+1}^n-U_j^n\right).
+\]
+
+Análogamente, usando diferencia hacia la izquierda,
+\[
+U_x(x_j,t_n)\approx \frac{U_j^n-U_{j-1}^n}{h},
+\]
+obtenemos
+\[
+U_j^{n+1}
+=
+U_j^n
+-
+\frac{k}{h}A\left(U_j^n-U_{j-1}^n\right).
+\]
+
+\paragraph{Interpretación.}
+Estos métodos ya no son simétricos en el espacio. Introducen una dirección preferente, y eso es muy relevante en ecuaciones de transporte.
+
+\paragraph{Observación importante.}
+En el caso escalar \(U_t+aU_x=0\), la elección del lado correcto está relacionada con el signo de \(a\):
+\begin{itemize}
+    \item si \(a>0\), la información se propaga hacia la derecha y suele convenir usar diferencia hacia atrás;
+    \item si \(a<0\), la información se propaga hacia la izquierda y suele convenir usar diferencia hacia adelante.
+\end{itemize}
+Esto anticipa la idea de \emph{upwind}.
+
+\subsection{Método leapfrog}
+
+Si ahora aproximamos la derivada temporal con diferencia centrada,
+\[
+U_t(x_j,t_n)\approx \frac{U_j^{n+1}-U_j^{n-1}}{2k},
+\]
+y mantenemos la diferencia centrada para la derivada espacial,
+\[
+U_x(x_j,t_n)\approx \frac{U_{j+1}^n-U_{j-1}^n}{2h},
+\]
+obtenemos
+\[
+\frac{U_j^{n+1}-U_j^{n-1}}{2k}
++
+A\frac{U_{j+1}^n-U_{j-1}^n}{2h}
+=0.
+\]
+
+Equivalentemente,
+\[
+U_j^{n+1}
+=
+U_j^{n-1}
+-
+\frac{k}{h}A\left(U_{j+1}^n-U_{j-1}^n\right).
+\]
+
+\paragraph{Interpretación.}
+Este método usa tres niveles temporales: \(n-1\), \(n\) y \(n+1\). Por eso, para ponerlo en marcha, no basta con \(U^0\): también se necesita una forma de construir \(U^1\), por ejemplo con otro método de dos niveles.
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item \emph{Leapfrog} es un método de tres niveles.
+    \item No puede iniciarse solo con la condición inicial.
+\end{itemize}
+
+\subsection{Método de Lax--Friedrichs}
+
+En lugar de conservar \(U_j^n\) como valor central, se reemplaza por el promedio de sus vecinos:
+\[
+U_j^{n+1}
+=
+\frac{U_{j+1}^n+U_{j-1}^n}{2}
+-
+\frac{k}{2h}A\left(U_{j+1}^n-U_{j-1}^n\right).
+\]
+
+\paragraph{Interpretación.}
+El promedio
+\[
+\frac{U_{j+1}^n+U_{j-1}^n}{2}
+\]
+introduce un efecto suavizante o difusivo. Esa difusión artificial suele mejorar la estabilidad, pero puede hacer que la solución numérica se vea más ``borrosa'' que la solución exacta.
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item Lax--Friedrichs modifica el método centrado agregando un promedio de vecinos.
+    \item Ese promedio introduce disipación numérica.
+\end{itemize}
+
+\subsection{Derivación tipo Taylor}
+
+Expandimos en serie de Taylor respecto del tiempo:
+\[
+U(x,t+k)=U(x,t)+kU_t(x,t)+\frac{k^2}{2}U_{tt}(x,t)+O(k^3).
+\]
+
+Como la ecuación satisface
+\[
+U_t=-AU_x,
+\]
+podemos derivar nuevamente respecto de \(t\):
+\[
+U_{tt} = -A(U_t)_x.
+\]
+Usando otra vez que \(U_t=-AU_x\),
+\[
+U_{tt}
+=
+-A(-AU_x)_x
+=
+A^2U_{xx}.
+\]
+
+Sustituyendo, obtenemos
+\[
+U(x,t+k)
+=
+U(x,t)-kAU_x(x,t)+\frac{k^2}{2}A^2U_{xx}(x,t)+O(k^3).
+\]
+
+\paragraph{Interpretación.}
+Aquí aparece una idea muy importante: usamos la EDP para transformar derivadas temporales en derivadas espaciales. Esto permite construir métodos de orden más alto sin derivar directamente la solución exacta.
+
+\subsection{Método de Lax--Wendroff}
+
+Aproximamos ahora
+\[
+U_x(x_j,t_n)\approx \frac{U_{j+1}^n-U_{j-1}^n}{2h},
+\qquad
+U_{xx}(x_j,t_n)\approx \frac{U_{j+1}^n-2U_j^n+U_{j-1}^n}{h^2}.
+\]
+
+Al sustituir estas fórmulas en la expansión de Taylor anterior, obtenemos
+\[
+U_j^{n+1}
+=
+U_j^n
+-\frac{k}{2h}A\left(U_{j+1}^n-U_{j-1}^n\right)
++\frac{k^2}{2h^2}A^2\left(U_{j+1}^n-2U_j^n+U_{j-1}^n\right).
+\]
+
+\paragraph{Interpretación.}
+Este método corrige al esquema centrado básico añadiendo un término de segundo orden. Por eso suele ser más preciso que un esquema explícito centrado elemental.
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item Lax--Wendroff nace de Taylor en tiempo.
+    \item Luego se usa la ecuación para expresar \(U_t\) y \(U_{tt}\) en términos espaciales.
+    \item Finalmente se reemplazan \(U_x\) y \(U_{xx}\) por diferencias finitas.
+\end{itemize}
+
+\subsection{Forma operatorial del método}
+
+Un método numérico puede escribirse, en forma abstracta, como
+\[
+U^{n+1}=H_h(U^n),
+\]
+donde \(H_h\) es el operador de avance temporal asociado al esquema.
+
+En el caso de Lax--Wendroff, para una función \(v\), puede definirse
+\[
+H_h(v)(x)
+=
+v(x)
+-
+\frac{kA}{2h}\bigl(v(x+h)-v(x-h)\bigr)
++
+\frac{k^2A^2}{2h^2}\bigl(v(x+h)-2v(x)+v(x-h)\bigr).
+\]
+
+Así, el método puede interpretarse como
+\[
+U_h(x,t+k)=H_h(U_h(\cdot,t))(x).
+\]
+
+\paragraph{Interpretación.}
+Esto permite pensar el esquema como una transformación aplicada repetidamente. Es una forma muy útil de escribir el método cuando se estudian propiedades teóricas como estabilidad y convergencia.
+
+\subsection{Error global}
+
+Definimos el error global en el nodo \((x_j,t_n)\) por
+\[
+E_j^n := U_j^n - U(x_j,t_n).
+\]
+
+\paragraph{Interpretación.}
+El error global mide la diferencia entre la solución numérica y la solución exacta en cada nodo de la malla.
+
+\paragraph{Objetivo del análisis numérico.}
+Queremos estudiar condiciones bajo las cuales
+\[
+E_j^n \to 0
+\qquad \text{cuando } h\to 0,\ k\to 0,
+\]
+manteniendo controlada la razón \(\lambda = k/h\).
+
+\paragraph{Qué debe quedar claro al final de este bloque.}
+\begin{itemize}
+    \item Una EDP se discretiza reemplazando derivadas por diferencias.
+    \item Eso produce una regla de evolución para los valores \(U_j^n\).
+    \item Existen varios esquemas posibles, y cada uno usa un esténcil distinto.
+    \item Los métodos se comparan por precisión, costo y estabilidad.
+    \item El análisis posterior girará en torno a consistencia, estabilidad y convergencia.
+\end{itemize}
+
+
+\subsection{Convergencia, consistencia y error de truncación local}
+
+Definimos el error global continuo por
+\[
+E_h(x,t):=U_h(x,t)-U(x,t),
+\qquad x\in\mathbb{R},\ t>0,
+\]
+donde \(U_h\) es la aproximación numérica por pedazos y \(U\) es la solución exacta del problema de Cauchy.
+
+\paragraph{Convergencia.}
+Diremos que el método es \textbf{convergente} si, para todo \(t>0\) fijo,
+\[
+\|E_h(\cdot,t)\|_{L^1(\mathbb{R})}\longrightarrow 0
+\qquad \text{cuando } h\to 0,
+\]
+manteniendo \(\lambda=\frac{k}{h}\) acotado o constante, según el contexto.
+
+\paragraph{Versión discreta.}
+Si definimos el error nodal
+\[
+E_j^n := U_j^n-U(x_j,t_n),
+\]
+entonces \(E^n=(E_j^n)_j\) es el vector de errores en el tiempo \(t_n\). En la malla uniforme, una norma natural es la norma discreta \(L^1\):
+\[
+\|V^n\|_{1,h}:=h\sum_{j\in\mathbb{Z}} |V_j^n|.
+\]
+
+\paragraph{Idea central.}
+La convergencia significa que, al refinar la malla, la solución numérica se acerca a la solución exacta.
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item El error global compara \emph{solución numérica} con \emph{solución exacta}.
+    \item La convergencia es una propiedad del método cuando \(h,k\to 0\).
+    \item Para medir el error se necesita fijar una norma.
+\end{itemize}
+
+\subsubsection{Error de truncación local}
+
+\paragraph{Idea.}
+El error de truncación local se obtiene al reemplazar la solución exacta \(U\) dentro del esquema numérico. Si el resultado no es exactamente cero, ese residuo mide cuánto se equivoca el método al nivel infinitesimal.
+
+\paragraph{Ejemplo: método de Lax--Friedrichs.}
+El esquema de Lax--Friedrichs es
+\[
+\frac{U_j^{n+1}-\frac12\left(U_{j+1}^n+U_{j-1}^n\right)}{k}
++
+A\frac{U_{j+1}^n-U_{j-1}^n}{2h}
+=0.
+\]
+
+Asociamos a este esquema el operador de truncación local
+\[
+L_h(x,t):=
+\frac{1}{k}\left(
+U(x,t+k)-\frac{U(x+h,t)+U(x-h,t)}{2}
+\right)
++
+A\frac{U(x+h,t)-U(x-h,t)}{2h},
+\]
+donde \(U\) es la solución exacta de
+\[
+U_t+A\,U_x=0.
+\]
+
+\paragraph{Desarrollo de Taylor.}
+Expandimos alrededor del punto \((x,t)\):
+\[
+U(x,t+k)
+=
+U(x,t)+kU_t(x,t)+\frac{k^2}{2}U_{tt}(x,t)+O(k^3),
+\]
+\[
+U(x+h,t)
+=
+U(x,t)+hU_x(x,t)+\frac{h^2}{2}U_{xx}(x,t)+\frac{h^3}{6}U_{xxx}(x,t)
++\frac{h^4}{24}U_{xxxx}(x,t)+O(h^5),
+\]
+\[
+U(x-h,t)
+=
+U(x,t)-hU_x(x,t)+\frac{h^2}{2}U_{xx}(x,t)-\frac{h^3}{6}U_{xxx}(x,t)
++\frac{h^4}{24}U_{xxxx}(x,t)+O(h^5).
+\]
+
+Sustituyendo en \(L_h(x,t)\), se obtiene
+\[
+L_h(x,t)
+=
+U_t(x,t)+A\,U_x(x,t)
++\frac{k}{2}U_{tt}(x,t)
+-\frac{h^2}{2k}U_{xx}(x,t)
++\frac{h^2}{6}A\,U_{xxx}(x,t)
+-\frac{h^4}{24k}U_{xxxx}(x,t)
++O(k^2)+O(h^4).
+\]
+
+Como \(U\) satisface la ecuación \(U_t+A\,U_x=0\), el término principal desaparece y queda
+\[
+L_h(x,t)
+=
+\frac{k}{2}U_{tt}(x,t)
+-\frac{h^2}{2k}U_{xx}(x,t)
++\frac{h^2}{6}A\,U_{xxx}(x,t)
+-\frac{h^4}{24k}U_{xxxx}(x,t)
++O(k^2)+O(h^4).
+\]
+
+Si además suponemos
+\[
+\frac{k}{h}=\lambda=\text{cte},
+\]
+entonces
+\[
+\frac{h^2}{k}=O(h)=O(k),
+\qquad
+\frac{h^4}{k}=O(h^3),
+\]
+y por tanto, si \(U\) y sus derivadas relevantes están acotadas, existe \(C>0\) tal que
+\[
+|L_h(x,t)|\le Ck.
+\]
+
+\paragraph{Conclusión.}
+Bajo la hipótesis \(\frac{k}{h}=\text{cte}\), el método de Lax--Friedrichs es consistente y su error de truncación local es de orden \(1\).
+
+\paragraph{Definición.}
+Diremos que un método es \textbf{consistente} si, para todo \(t>0\) fijo,
+\[
+\|L_h(\cdot,t)\|\longrightarrow 0
+\qquad \text{cuando } h\to 0.
+\]
+
+\paragraph{Definición.}
+Diremos que un método es de \textbf{orden \(p\)} si existe una constante \(C>0\) tal que
+\[
+\|L_h(\cdot,t)\|\le C h^p,
+\]
+para \(h\) suficientemente pequeño y \(t\) en intervalos acotados.
+
+\begin{observacion}
+En el caso anterior, el método de Lax--Friedrichs resulta de orden \(1\).
+\end{observacion}
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item El error de truncación local se obtiene metiendo la solución exacta en el esquema.
+    \item La consistencia exige que ese residuo tienda a cero cuando la malla se refina.
+    \item El orden del método mide qué tan rápido tiende a cero ese residuo.
+\end{itemize}
+
+\subsection{Aproximación de derivadas usando ETL}
+
+La misma idea del error de truncación local puede usarse para construir fórmulas de diferencias finitas para derivadas.
+
+\paragraph{Idea general.}
+Se propone una combinación lineal de valores vecinos y luego se eligen los coeficientes para que, al desarrollar en Taylor, los términos no deseados se anulen.
+
+\subsubsection{Aproximación de \texorpdfstring{$v_x(x_j)$}{v_x(x_j)} usando cuatro puntos}
+
+Buscamos una fórmula del tipo
+\[
+v_x(x_j)\approx a\,v_{j+1}+b\,v_j+c\,v_{j-1}+d\,v_{j-2},
+\]
+donde \(v_j=v(x_j)\).
+
+Definimos el residuo
+\[
+L_h[v](x_j):=
+a\,v(x_j+h)+b\,v(x_j)+c\,v(x_j-h)+d\,v(x_j-2h)-v_x(x_j).
+\]
+
+Usando Taylor,
+\[
+v(x_j+h)=v+h v_x+\frac{h^2}{2}v_{xx}+\frac{h^3}{6}v_{xxx}+\frac{h^4}{24}v_{xxxx}+O(h^5),
+\]
+\[
+v(x_j-h)=v-h v_x+\frac{h^2}{2}v_{xx}-\frac{h^3}{6}v_{xxx}+\frac{h^4}{24}v_{xxxx}+O(h^5),
+\]
+\[
+v(x_j-2h)=v-2h v_x+2h^2 v_{xx}-\frac{4}{3}h^3 v_{xxx}+\frac{2}{3}h^4 v_{xxxx}+O(h^5).
+\]
+
+Al imponer que los coeficientes de \(v\), \(v_{xx}\) y \(v_{xxx}\) se anulen, y que el coeficiente de \(v_x\) sea \(1\), se obtiene el sistema
+\[
+\begin{cases}
+a+b+c+d=0,\\[4pt]
+ha-hc-2hd=1,\\[4pt]
+\dfrac{h^2}{2}a+\dfrac{h^2}{2}c+2h^2 d=0,\\[8pt]
+\dfrac{h^3}{6}a-\dfrac{h^3}{6}c-\dfrac{4}{3}h^3 d=0.
+\end{cases}
+\]
+
+Su solución es
+\[
+a=\frac{1}{3h},\qquad
+b=\frac{1}{2h},\qquad
+c=-\frac{1}{h},\qquad
+d=\frac{1}{6h}.
+\]
+
+Por tanto,
+\[
+v_x(x_j)
+\approx
+\frac{1}{6h}\Bigl(2v_{j+1}+3v_j-6v_{j-1}+v_{j-2}\Bigr).
+\]
+
+Además, el primer término no anulado en el residuo es de orden \(h^3\), así que
+\[
+L_h[v](x_j)=O(h^3).
+\]
+
+\paragraph{Conclusión.}
+La fórmula
+\[
+v_x(x_j)
+\approx
+\frac{1}{6h}\Bigl(2v_{j+1}+3v_j-6v_{j-1}+v_{j-2}\Bigr)
+\]
+es una aproximación de orden \(3\) para la primera derivada.
+
+\subsubsection{Aproximación centrada de \texorpdfstring{$v_{xx}(x_j)$}{v_xx(x_j)}}
+
+Buscamos ahora una fórmula del tipo
+\[
+v_{xx}(x_j)\approx a\,v_{j+1}+b\,v_j+c\,v_{j-1}.
+\]
+
+Definimos
+\[
+L_h[v](x_j):=
+a\,v(x_j+h)+b\,v(x_j)+c\,v(x_j-h)-v_{xx}(x_j).
+\]
+
+Usando Taylor y anulando los términos de orden menor, se obtiene
+\[
+a=\frac{1}{h^2},\qquad
+b=-\frac{2}{h^2},\qquad
+c=\frac{1}{h^2}.
+\]
+
+Entonces,
+\[
+v_{xx}(x_j)
+\approx
+\frac{v_{j+1}-2v_j+v_{j-1}}{h^2}.
+\]
+
+El residuo satisface
+\[
+L_h[v](x_j)=O(h^2).
+\]
+
+\paragraph{Conclusión.}
+La fórmula centrada clásica para la segunda derivada es
+\[
+v_{xx}(x_j)
+\approx
+\frac{v_{j+1}-2v_j+v_{j-1}}{h^2},
+\]
+y es de orden \(2\).
+
+\subsubsection{Aproximación de \texorpdfstring{$v_{xxx}(x_j)$}{v_xxx(x_j)} usando cinco nodos}
+
+Para aproximar la tercera derivada, consideramos
+\[
+v_{xxx}(x_j)\approx a\,v_{j+2}+b\,v_{j+1}+c\,v_j+d\,v_{j-1}+e\,v_{j-2}.
+\]
+
+Definimos el residuo
+\[
+L_h[v](x_j):=
+a\,v(x_j+2h)+b\,v(x_j+h)+c\,v(x_j)+d\,v(x_j-h)+e\,v(x_j-2h)-v_{xxx}(x_j).
+\]
+
+Desarrollando en Taylor y anulando los términos correspondientes a \(v\), \(v_x\), \(v_{xx}\) y \(v_{xxxx}\), mientras se fuerza que el coeficiente de \(v_{xxx}\) sea \(1\), se obtiene finalmente
+\[
+a=\frac{1}{2h^3},\qquad
+b=-\frac{1}{h^3},\qquad
+c=0,\qquad
+d=\frac{1}{h^3},\qquad
+e=-\frac{1}{2h^3}.
+\]
+
+Por tanto,
+\[
+v_{xxx}(x_j)
+\approx
+\frac{1}{2h^3}v_{j+2}
+-\frac{1}{h^3}v_{j+1}
++\frac{1}{h^3}v_{j-1}
+-\frac{1}{2h^3}v_{j-2}.
+\]
+
+Equivalentemente,
+\[
+v_{xxx}(x_j)
+\approx
+\frac{v_{j+2}-2v_{j+1}+2v_{j-1}-v_{j-2}}{2h^3}.
+\]
+
+El residuo es de orden \(h^2\), es decir,
+\[
+L_h[v](x_j)=O(h^2).
+\]
+
+\paragraph{Conclusión.}
+La fórmula
+\[
+v_{xxx}(x_j)
+\approx
+\frac{v_{j+2}-2v_{j+1}+2v_{j-1}-v_{j-2}}{2h^3}
+\]
+aproxima la tercera derivada con orden \(2\).
+
+\paragraph{Qué debe quedar claro al final de este bloque.}
+\begin{itemize}
+    \item El mismo principio usado para estudiar consistencia sirve para construir fórmulas de derivación numérica.
+    \item Se propone una combinación lineal de nodos vecinos.
+    \item Luego se usa Taylor para forzar que los términos de bajo orden se cancelen.
+    \item El primer término que no se cancela determina el orden de la aproximación.
+\end{itemize}
+
+\subsection{Error global y ecuación del error}
+
+Definimos el error global por
+\[
+E_h(x,t):=U_h(x,t)-U(x,t),
+\]
+donde \(U_h\) es la aproximación numérica y \(U\) es la solución exacta del problema
+\[
+U_t+A\,U_x=0.
+\]
+
+Supondremos que el método puede escribirse en forma operatorial como
+\[
+U_h(x,t+k)=H_h\bigl(U_h(\cdot,t);x\bigr),
+\]
+es decir, \(H_h\) toma el estado numérico en el tiempo \(t\) y lo hace avanzar al tiempo \(t+k\).
+
+\paragraph{Error de truncación local.}
+Recordemos que el error de truncación local viene dado por
+\[
+L_h(x,t):=\frac{U(x,t+k)-H_h(U(\cdot,t);x)}{k}.
+\]
+Equivalentemente,
+\[
+U(x,t+k)=H_h(U(\cdot,t);x)+k\,L_h(x,t).
+\]
+
+\paragraph{Ecuación del error.}
+Restando la ecuación satisfecha por \(U\) de la ecuación satisfecha por \(U_h\), obtenemos
+\[
+E_h(x,t+k)
+=
+H_h\bigl(U_h(\cdot,t);x\bigr)-H_h\bigl(U(\cdot,t);x\bigr)-k\,L_h(x,t).
+\]
+
+Si \(H_h\) es lineal, entonces
+\[
+E_h(x,t+k)=H_h\bigl(E_h(\cdot,t);x\bigr)-k\,L_h(x,t).
+\]
+
+\paragraph{Iteración de la ecuación del error.}
+Tomando \(t_n=nk\), se obtiene por iteración
+\[
+E_h(x,t_n)
+=
+H_h^n\bigl(E_h(\cdot,t_0);x\bigr)
+-
+k\sum_{i=0}^{n-1}
+H_h^{\,n-1-i}\bigl(L_h(\cdot,t_i);x\bigr),
+\]
+donde, por convención,
+\[
+H_h^0=I.
+\]
+
+\paragraph{Idea central.}
+Esta identidad separa el error total en dos contribuciones:
+\begin{itemize}
+    \item el error inicial propagado por el método;
+    \item la acumulación, a lo largo del tiempo, de los errores de truncación local.
+\end{itemize}
+
+\subsection{Estabilidad}
+
+\paragraph{Definición.}
+Diremos que el método es \textbf{estable} en \([0,T]\) si existen constantes \(C_S>0\) y \(h_0>0\) tales que
+\[
+\|H_h^n\|\le C_S,
+\qquad
+\forall\, t_n=nk\le T,\quad 0<h\le h_0.
+\]
+
+\paragraph{Caso suficiente usual.}
+Si existe \(\alpha\ge 0\) tal que
+\[
+\|H_h\|\le 1+\alpha k,
+\]
+entonces
+\[
+\|H_h^n\|
+\le
+(1+\alpha k)^n
+\le
+e^{\alpha nk}
+\le
+e^{\alpha T}.
+\]
+Por tanto, el método es estable en todo intervalo temporal acotado.
+
+\begin{observacion}
+En particular, si
+\[
+\|H_h\|\le 1,
+\]
+entonces automáticamente
+\[
+\|H_h^n\|\le 1,
+\]
+y el método es estable.
+\end{observacion}
+
+\subsection{Convergencia del método}
+
+Tomando norma en la fórmula del error iterado, obtenemos
+\[
+\|E_h(\cdot,t_n)\|
+\le
+\|H_h^n\|\,\|E_h(\cdot,t_0)\|
++
+k\sum_{i=0}^{n-1}
+\|H_h^{\,n-1-i}\|\,\|L_h(\cdot,t_i)\|.
+\]
+
+Si el método es estable, entonces
+\[
+\|H_h^{\,n-1-i}\|\le C_S,
+\]
+y por tanto
+\[
+\|E_h(\cdot,t_n)\|
+\le
+C_S\,\|E_h(\cdot,t_0)\|
++
+k\,C_S\sum_{i=0}^{n-1}\|L_h(\cdot,t_i)\|.
+\]
+
+Si además el método es consistente de orden \(p\), es decir, existe \(C_L>0\) tal que
+\[
+\|L_h(\cdot,t_i)\|\le C_L\,k^p,
+\]
+para todo \(t_i\) en intervalos acotados, entonces
+\[
+\|E_h(\cdot,t_n)\|
+\le
+C_S\,\|E_h(\cdot,t_0)\|
++
+k\,C_S\,C_L\sum_{i=0}^{n-1}k^p.
+\]
+
+En particular, si se toma dato inicial exacto, esto es,
+\[
+U_h(x,0)=U_0(x)
+\qquad \text{o equivalentemente} \qquad
+U_j^0=U_0(x_j),
+\]
+entonces
+\[
+E_h(\cdot,t_0)=0,
+\]
+y queda
+\[
+\|E_h(\cdot,t_n)\|
+\le
+k\,C_S\,C_L\sum_{i=0}^{n-1}k^p
+=
+C_S\,C_L\,t_n\,k^p.
+\]
+
+Como \(t_n\le T\), concluimos que
+\[
+\|E_h(\cdot,t_n)\|
+\le
+C_S\,C_L\,T\,k^p
+\longrightarrow 0
+\qquad \text{cuando } k\to 0.
+\]
+
+\paragraph{Conclusión.}
+Se obtiene el principio fundamental:
+\[
+\boxed{\text{Estabilidad}+\text{Consistencia}\Longrightarrow \text{Convergencia}.}
+\]
+
+\paragraph{Qué debe quedar claro.}
+\begin{itemize}
+    \item La estabilidad controla cómo el método amplifica errores.
+    \item La consistencia controla el tamaño del error local cometido en cada paso.
+    \item La convergencia resulta de combinar ambas propiedades.
+\end{itemize}
+
+\subsection{Ejemplo: estabilidad del método de Lax--Friedrichs}
+
+Consideremos la ecuación escalar
+\[
+u_t+a\,u_x=0,
+\qquad a\in\mathbb{R}.
+\]
+
+El esquema de Lax--Friedrichs es
+\[
+u_j^{n+1}
+=
+\frac{u_{j+1}^n+u_{j-1}^n}{2}
+-
+\frac{ak}{2h}\bigl(u_{j+1}^n-u_{j-1}^n\bigr).
+\]
+
+Reescribiendo,
+\[
+u_j^{n+1}
+=
+\frac12\left(1-\frac{ak}{h}\right)u_{j+1}^n
++
+\frac12\left(1+\frac{ak}{h}\right)u_{j-1}^n.
+\]
+
+Trabajamos con la norma discreta \(L^1\):
+\[
+\|u^n\|_{1,h}:=h\sum_{j\in\mathbb{Z}}|u_j^n|.
+\]
+
+Si suponemos
+\[
+1-\frac{ak}{h}>0
+\qquad \text{y} \qquad
+1+\frac{ak}{h}>0,
+\]
+es decir,
+\[
+\left|\frac{ak}{h}\right|<1,
+\]
+entonces los coeficientes son no negativos, y por tanto
+\[
+|u_j^{n+1}|
+\le
+\frac12\left(1-\frac{ak}{h}\right)|u_{j+1}^n|
++
+\frac12\left(1+\frac{ak}{h}\right)|u_{j-1}^n|.
+\]
+
+Multiplicando por \(h\) y sumando en \(j\),
+\[
+\sum_j h|u_j^{n+1}|
+\le
+\frac12\left(1-\frac{ak}{h}\right)\sum_j h|u_{j+1}^n|
++
+\frac12\left(1+\frac{ak}{h}\right)\sum_j h|u_{j-1}^n|.
+\]
+
+Como un corrimiento de índices no cambia la suma,
+\[
+\sum_j h|u_{j+1}^n|=\sum_j h|u_j^n|,
+\qquad
+\sum_j h|u_{j-1}^n|=\sum_j h|u_j^n|,
+\]
+y así
+\[
+\|u^{n+1}\|_{1,h}
+\le
+\frac12\left(1-\frac{ak}{h}\right)\|u^n\|_{1,h}
++
+\frac12\left(1+\frac{ak}{h}\right)\|u^n\|_{1,h}
+=
+\|u^n\|_{1,h}.
+\]
+
+\paragraph{Conclusión.}
+El método de Lax--Friedrichs es estable en norma discreta \(L^1\) si
+\[
+\boxed{\left|\frac{ak}{h}\right|<1.}
+\]
+
+\subsection{Ejemplo: método de un lado}
+
+Consideremos ahora el esquema explícito con diferencia hacia la derecha:
+\[
+u_j^{n+1}
+=
+u_j^n-\frac{ak}{h}\bigl(u_{j+1}^n-u_j^n\bigr).
+\]
+
+Reescribiendo,
+\[
+u_j^{n+1}
+=
+\left(1+\frac{ak}{h}\right)u_j^n
+-
+\frac{ak}{h}\,u_{j+1}^n.
+\]
+
+Si suponemos
+\[
+1+\frac{ak}{h}>0
+\qquad \text{y} \qquad
+-\frac{ak}{h}>0,
+\]
+entonces necesariamente
+\[
+0<-\frac{ak}{h}<1,
+\]
+lo cual corresponde al caso \(a<0\).
+
+Bajo esta condición,
+\[
+|u_j^{n+1}|
+\le
+\left(1+\frac{ak}{h}\right)|u_j^n|
+-
+\frac{ak}{h}|u_{j+1}^n|.
+\]
+
+Multiplicando por \(h\) y sumando,
+\[
+\|u^{n+1}\|_{1,h}
+\le
+\left(1+\frac{ak}{h}\right)\|u^n\|_{1,h}
+-
+\frac{ak}{h}\|u^n\|_{1,h}
+=
+\|u^n\|_{1,h}.
+\]
+
+\paragraph{Conclusión.}
+El método de un lado hacia la derecha es estable si
+\[
+\boxed{0<-\frac{ak}{h}<1, \qquad a<0.}
+\]
+
+\begin{observacion}
+De manera análoga, el esquema hacia la izquierda
+\[
+u_j^{n+1}
+=
+u_j^n-\frac{ak}{h}\bigl(u_j^n-u_{j-1}^n\bigr)
+\]
+resulta estable cuando
+\[
+0<\frac{ak}{h}<1,
+\qquad a>0.
+\]
+Esto refleja la idea de que el lado de la discretización debe ser coherente con el sentido de propagación de la ecuación.
+\end{observacion}
