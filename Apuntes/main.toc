@@ -78,3 +78,39 @@
 \contentsline {paragraph}{Conclusión.}{16}{section*.53}%
 \contentsline {subsection}{\numberline {1.21}Ejemplo: método de un lado}{17}{subsection.1.21}%
 \contentsline {paragraph}{Conclusión.}{17}{section*.54}%
+\contentsline {subsection}{\numberline {1.22}Estabilidad para \(U_t+A\,U_x=0\)}{17}{subsection.1.22}%
+\contentsline {subsubsection}{\numberline {1.22.1}Caso escalar: método de Lax--Friedrichs}{18}{subsubsection.1.22.1}%
+\contentsline {paragraph}{Idea.}{18}{section*.55}%
+\contentsline {subsubsection}{\numberline {1.22.2}Paso al caso matricial}{18}{subsubsection.1.22.2}%
+\contentsline {paragraph}{Conclusión.}{18}{section*.56}%
+\contentsline {subsection}{\numberline {1.23}Métodos \emph {upwind} para el caso escalar}{19}{subsection.1.23}%
+\contentsline {paragraph}{Caso \(a>0\).}{19}{section*.57}%
+\contentsline {paragraph}{Caso \(a<0\).}{19}{section*.58}%
+\contentsline {paragraph}{Idea central.}{19}{section*.59}%
+\contentsline {subsection}{\numberline {1.24}Método \emph {upwind} para sistemas}{19}{subsection.1.24}%
+\contentsline {paragraph}{Interpretación.}{20}{section*.60}%
+\contentsline {subsection}{\numberline {1.25}Ecuación no lineal y formación de saltos}{20}{subsection.1.25}%
+\contentsline {paragraph}{Observación.}{20}{section*.61}%
+\contentsline {paragraph}{Qué debe quedar claro.}{20}{section*.62}%
+\contentsline {subsection}{\numberline {1.26}Un esquema no conservativo puede fallar}{20}{subsection.1.26}%
+\contentsline {paragraph}{Conclusión.}{21}{section*.63}%
+\contentsline {subsection}{\numberline {1.27}Métodos conservativos}{21}{subsection.1.27}%
+\contentsline {paragraph}{Idea.}{21}{section*.64}%
+\contentsline {subsubsection}{\numberline {1.27.1}Ejemplo: Burgers}{21}{subsubsection.1.27.1}%
+\contentsline {paragraph}{Observación.}{22}{section*.65}%
+\contentsline {paragraph}{Resumen de este bloque.}{22}{section*.66}%
+\contentsline {section}{\numberline {2}Problemas con valores en la frontera}{22}{section.2}%
+\contentsline {paragraph}{Modelo.}{22}{section*.67}%
+\contentsline {subsection}{\numberline {2.1}Problema estacionario}{22}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Discretización del problema estacionario}{23}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Sistema matricial}{23}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Error de truncación local}{24}{subsection.2.4}%
+\contentsline {paragraph}{Conclusión.}{24}{section*.68}%
+\contentsline {subsection}{\numberline {2.5}Convergencia}{24}{subsection.2.5}%
+\contentsline {paragraph}{Conclusión.}{25}{section*.69}%
+\contentsline {subsection}{\numberline {2.6}Estabilidad del método}{25}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.7}Normas matriciales}{25}{subsection.2.7}%
+\contentsline {subsection}{\numberline {2.8}Valores propios de \(A^h\)}{26}{subsection.2.8}%
+\contentsline {paragraph}{Conclusión.}{26}{section*.70}%
+\contentsline {subsection}{\numberline {2.9}Conclusión final}{27}{subsection.2.9}%
+\contentsline {paragraph}{Resumen.}{27}{section*.71}%

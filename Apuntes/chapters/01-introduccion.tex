@@ -1107,3 +1107,769 @@ resulta estable cuando
 \]
 Esto refleja la idea de que el lado de la discretización debe ser coherente con el sentido de propagación de la ecuación.
 \end{observacion}
+
+\subsection{Estabilidad para \(U_t+A\,U_x=0\)}
+
+Consideramos el problema
+\[
+\begin{cases}
+U_t+A\,U_x=0, & x\in\mathbb{R},\ t>0,\\[4pt]
+U(x,0)=U_0(x), & x\in\mathbb{R}.
+\end{cases}
+\]
+
+\subsubsection{Caso escalar: método de Lax--Friedrichs}
+
+Para la ecuación escalar
+\[
+u_t+a\,u_x=0,
+\qquad a\in\mathbb{R},
+\]
+el método de Lax--Friedrichs viene dado por
+\[
+u_j^{n+1}
+=
+\frac{u_{j+1}^n+u_{j-1}^n}{2}
+-\frac{ak}{2h}\Bigl(u_{j+1}^n-u_{j-1}^n\Bigr).
+\]
+
+Este esquema es estable si
+\[
+\left|\frac{ak}{h}\right|<1.
+\]
+
+\paragraph{Idea.}
+La condición anterior es una condición CFL: el paso temporal debe ser suficientemente pequeño en comparación con el paso espacial y con la velocidad de propagación.
+
+\subsubsection{Paso al caso matricial}
+
+Supongamos ahora que \(A\in M_{m\times m}(\mathbb{R})\) es diagonalizable, es decir,
+\[
+A=R\Lambda R^{-1},
+\]
+donde
+\[
+\Lambda=
+\begin{pmatrix}
+\lambda_1 &        & 0\\
+          & \ddots &  \\
+0         &        & \lambda_m
+\end{pmatrix},
+\]
+y \(\lambda_1,\dots,\lambda_m\) son los valores propios reales de \(A\).
+
+Entonces
+\[
+U_t+A\,U_x=0
+\quad\Longleftrightarrow\quad
+U_t+R\Lambda R^{-1}U_x=0.
+\]
+
+Multiplicando por \(R^{-1}\), obtenemos
+\[
+R^{-1}U_t+\Lambda R^{-1}U_x=0.
+\]
+
+Si definimos
+\[
+V:=R^{-1}U,
+\]
+entonces
+\[
+V_t+\Lambda V_x=0.
+\]
+
+Como \(\Lambda\) es diagonal, esta ecuación se desacopla en
+\[
+(V_i)_t+\lambda_i (V_i)_x=0,
+\qquad i=1,\dots,m.
+\]
+
+\paragraph{Conclusión.}
+El problema desacoplado es estable si
+\[
+\left|\frac{\lambda_i k}{h}\right|<1,
+\qquad i=1,\dots,m.
+\]
+
+Denotaremos por
+\[
+V_j^n \approx V(x_j,t_n)
+\]
+la aproximación numérica de la variable diagonalizada.
+
+\subsection{Métodos \emph{upwind} para el caso escalar}
+
+Recordemos que para la ecuación escalar
+\[
+u_t+a\,u_x=0
+\]
+los esquemas de un lado apropiados dependen del signo de \(a\).
+
+\paragraph{Caso \(a>0\).}
+Se usa diferencia hacia atrás:
+\[
+u_j^{n+1}
+=
+u_j^n-\frac{ak}{h}\Bigl(u_j^n-u_{j-1}^n\Bigr),
+\]
+y el esquema es estable si
+\[
+0<\frac{ak}{h}<1.
+\]
+
+\paragraph{Caso \(a<0\).}
+Se usa diferencia hacia adelante:
+\[
+u_j^{n+1}
+=
+u_j^n-\frac{ak}{h}\Bigl(u_{j+1}^n-u_j^n\Bigr),
+\]
+y el esquema es estable si
+\[
+-1<\frac{ak}{h}<0.
+\]
+
+\paragraph{Idea central.}
+El lado de la discretización debe ser coherente con el sentido de propagación de la información.
+
+\subsection{Método \emph{upwind} para sistemas}
+
+Volvemos al sistema
+\[
+U_t+A\,U_x=0,
+\]
+con
+\[
+A=R\Lambda R^{-1}.
+\]
+
+Descomponemos la matriz diagonal \(\Lambda\) en su parte positiva y negativa:
+\[
+\Lambda=\Lambda^+ + \Lambda^-,
+\]
+donde
+\[
+\Lambda^+=
+\begin{pmatrix}
+\lambda_1^+ &        & 0\\
+            & \ddots &  \\
+0           &        & \lambda_m^+
+\end{pmatrix},
+\qquad
+\Lambda^-=
+\begin{pmatrix}
+\lambda_1^- &        & 0\\
+            & \ddots &  \\
+0           &        & \lambda_m^-
+\end{pmatrix},
+\]
+con
+\[
+\lambda_i^+=\max\{\lambda_i,0\},
+\qquad
+\lambda_i^-=\min\{\lambda_i,0\}.
+\]
+
+Definimos entonces
+\[
+A^+=R\Lambda^+R^{-1},
+\qquad
+A^-=R\Lambda^-R^{-1}.
+\]
+
+Obsérvese que
+\[
+A=A^++A^-.
+\]
+
+El método \emph{upwind} para el sistema se escribe como
+\[
+U_j^{n+1}
+=
+U_j^n
+-\frac{k}{h}A^+\Bigl(U_j^n-U_{j-1}^n\Bigr)
+-\frac{k}{h}A^-\Bigl(U_{j+1}^n-U_j^n\Bigr).
+\]
+
+\paragraph{Interpretación.}
+\begin{itemize}
+    \item La parte \(A^+\) usa diferencia hacia atrás.
+    \item La parte \(A^-\) usa diferencia hacia adelante.
+    \item El método separa automáticamente los modos que viajan a la derecha de los que viajan a la izquierda.
+\end{itemize}
+
+\subsection{Ecuación no lineal y formación de saltos}
+
+Consideremos ahora la ecuación no lineal
+\[
+u_t+u\,u_x=0.
+\]
+
+Como
+\[
+u\,u_x=\left(\frac{u^2}{2}\right)_x,
+\]
+también puede escribirse en forma conservativa como
+\[
+u_t+\left(\frac{u^2}{2}\right)_x=0.
+\]
+
+\paragraph{Observación.}
+Esta ecuación puede desarrollar discontinuidades (\emph{saltos}) en tiempo finito.
+
+Si el salto conecta el estado izquierdo \(u_1\) con el estado derecho \(u_2\), entonces la velocidad de propagación del choque viene dada por la condición de Rankine--Hugoniot:
+\[
+s=\frac{f(u_1)-f(u_2)}{u_1-u_2},
+\qquad
+f(u)=\frac{u^2}{2}.
+\]
+
+Por tanto,
+\[
+s
+=
+\frac{\frac{u_1^2}{2}-\frac{u_2^2}{2}}{u_1-u_2}
+=
+\frac{u_1+u_2}{2}.
+\]
+
+\paragraph{Qué debe quedar claro.}
+Para ecuaciones no lineales, la velocidad del salto depende de los estados a ambos lados de la discontinuidad.
+
+\subsection{Un esquema no conservativo puede fallar}
+
+Tomemos el esquema
+\[
+u_j^{n+1}
+=
+u_j^n-\frac{k}{h}u_j^n\Bigl(u_j^n-u_{j-1}^n\Bigr),
+\]
+que corresponde a discretizar directamente \(u_t+u\,u_x=0\).
+
+Consideremos el dato inicial escalón
+\[
+u_j^0=
+\begin{cases}
+1, & j<0,\\
+0, & j\ge 0.
+\end{cases}
+\]
+
+Entonces:
+\[
+u_1^1
+=
+0-\frac{k}{h}\,0\,(0-0)=0,
+\]
+\[
+u_0^1
+=
+0-\frac{k}{h}\,0\,(0-1)=0,
+\]
+\[
+u_{-1}^1
+=
+1-\frac{k}{h}\,1\,(1-1)=1.
+\]
+
+En consecuencia, el perfil queda igual después del primer paso. Repitiendo el argumento, se obtiene
+\[
+u_j^n=u_j^0,
+\qquad \forall\, n\ge 0.
+\]
+
+\paragraph{Conclusión.}
+El salto no se mueve, lo cual contradice la velocidad correcta
+\[
+s=\frac{1+0}{2}=\frac12.
+\]
+Por eso, este esquema \textbf{no sirve} para capturar correctamente la propagación del choque.
+
+\subsection{Métodos conservativos}
+
+Sea ahora la ley de conservación escalar
+\[
+u_t+f(u)_x=0.
+\]
+
+Un método conservativo tiene la forma
+\[
+u_j^{n+1}
+=
+u_j^n
+-\frac{k}{h}\Bigl(
+\mathcal{F}(u_j^n,u_{j+1}^n)
+-
+\mathcal{F}(u_{j-1}^n,u_j^n)
+\Bigr),
+\]
+donde \(\mathcal{F}\) es el \textbf{flujo numérico}.
+
+\paragraph{Idea.}
+La forma conservativa garantiza que el método respete la estructura de ley de conservación a nivel discreto. Esto es crucial para capturar correctamente la velocidad de los choques.
+
+\subsubsection{Ejemplo: Burgers}
+
+Para la ecuación de Burgers,
+\[
+u_t+\left(\frac{u^2}{2}\right)_x=0,
+\qquad
+f(u)=\frac{u^2}{2},
+\]
+el método de Lax--Friedrichs puede escribirse en forma conservativa usando el flujo numérico
+\[
+\mathcal{F}_{LF}(v,w)
+=
+\frac{1}{2}\bigl(f(v)+f(w)\bigr)-\frac{h}{2k}(w-v).
+\]
+
+Como aquí \(f(u)=u^2/2\), resulta
+\[
+\mathcal{F}_{LF}(v,w)
+=
+\frac{1}{2}\left(\frac{v^2}{2}+\frac{w^2}{2}\right)-\frac{h}{2k}(w-v)
+=
+\frac{h}{2k}(v-w)+\frac{v^2+w^2}{4}.
+\]
+
+El esquema asociado es
+\[
+u_j^{n+1}
+=
+\frac{u_{j+1}^n+u_{j-1}^n}{2}
+-\frac{k}{2h}
+\left(
+\frac{(u_{j+1}^n)^2}{2}
+-
+\frac{(u_{j-1}^n)^2}{2}
+\right).
+\]
+
+\paragraph{Observación.}
+El punto clave no es solo la fórmula, sino que el esquema está escrito como diferencia de flujos numéricos. Esa es la propiedad que permite reproducir correctamente la dinámica de los saltos.
+
+\paragraph{Resumen de este bloque.}
+\begin{itemize}
+    \item Para sistemas lineales, se diagonaliza \(A\) y se estudia cada modo por separado.
+    \item El método \emph{upwind} usa el signo de las velocidades características.
+    \item En ecuaciones no lineales, los choques obligan a trabajar en forma conservativa.
+    \item Un esquema no conservativo puede dar velocidades de choque incorrectas.
+    \item Los métodos conservativos se construyen mediante un flujo numérico \(\mathcal{F}\).
+\end{itemize}
+
+\section{Problemas con valores en la frontera}
+
+Consideramos el problema
+\[
+\begin{cases}
+\dfrac{\partial U}{\partial t}
+-
+\dfrac{\partial}{\partial x}\!\left(k(x)\dfrac{\partial U}{\partial x}\right)
+=
+f(x,t),
+& x\in(a,b),\ t>0,\\[8pt]
+U(a,t)=\alpha(t),\\
+U(b,t)=\beta(t),\\
+U(x,0)=U_0(x),
+\end{cases}
+\]
+donde
+\[
+U=U(x,t),
+\qquad
+k(x)>0 \ \text{en }(a,b).
+\]
+
+\paragraph{Modelo.}
+Este problema modela la temperatura en una barra. Aquí \(k(x)\) es la conductividad térmica y \(f(x,t)\) representa una fuente de calor.
+
+\subsection{Problema estacionario}
+
+Si
+\[
+U(x,t)\longrightarrow U(x), \qquad t\to\infty,
+\]
+y además
+\[
+f(x,t)\to f(x),\qquad
+\alpha(t)\to \alpha,\qquad
+\beta(t)\to \beta,
+\]
+entonces se espera obtener el problema estacionario
+\[
+\begin{cases}
+-\,U''(x)=f(x), & x\in(0,1),\\[4pt]
+U(0)=\alpha,\\
+U(1)=\beta.
+\end{cases}
+\]
+
+En lo que sigue tomaremos
+\[
+k(x)\equiv 1,
+\qquad
+a=0,
+\qquad
+b=1.
+\]
+
+\subsection{Discretización del problema estacionario}
+
+Tomamos una malla uniforme
+\[
+x_j=h\,j,
+\qquad
+j=0,1,\dots,m+1,
+\]
+con
+\[
+x_0=0,
+\qquad
+x_{m+1}=1.
+\]
+Por tanto,
+\[
+x_{m+1}=h(m+1)=1
+\qquad \Longrightarrow \qquad
+h=\frac{1}{m+1}.
+\]
+
+Buscamos aproximaciones
+\[
+U_j\approx U(x_j),
+\qquad j=1,\dots,m.
+\]
+
+Usando diferencias centradas,
+\[
+-\,U''(x_j)
+\approx
+-\frac{U_{j+1}-2U_j+U_{j-1}}{h^2},
+\qquad j=1,\dots,m.
+\]
+
+Así, la ecuación en diferencias queda
+\[
+-\frac{U_{j+1}-2U_j+U_{j-1}}{h^2}=f(x_j),
+\qquad j=1,\dots,m.
+\]
+
+\subsection{Sistema matricial}
+
+El sistema puede escribirse como
+\[
+A\,U=F,
+\]
+donde
+\[
+U=
+\begin{pmatrix}
+U_1\\
+\vdots\\
+U_m
+\end{pmatrix},
+\qquad
+A=
+\frac{1}{h^2}
+\begin{pmatrix}
+2 & -1 & 0 & \cdots & 0\\
+-1 & 2 & -1 & \ddots & \vdots\\
+0 & -1 & 2 & \ddots & 0\\
+\vdots & \ddots & \ddots & \ddots & -1\\
+0 & \cdots & 0 & -1 & 2
+\end{pmatrix},
+\]
+y
+\[
+F=
+\begin{pmatrix}
+f(x_1)+\dfrac{\alpha}{h^2}\\[6pt]
+f(x_2)\\
+\vdots\\
+f(x_{m-1})\\[2pt]
+f(x_m)+\dfrac{\beta}{h^2}
+\end{pmatrix}.
+\]
+
+\subsection{Error de truncación local}
+
+Definimos
+\[
+\zeta_j
+:=
+-\frac{U(x_{j+1})-2U(x_j)+U(x_{j-1})}{h^2}
+-f(x_j),
+\qquad j=1,\dots,m,
+\]
+donde ahora \(U\) es la solución exacta del problema continuo.
+
+\begin{observacion}
+En la ecuación en diferencias estamos evaluando el operador discreto sobre la solución exacta del problema
+\[
+-\,U''=f.
+\]
+\end{observacion}
+
+Usando Taylor alrededor de \(x_j\),
+\[
+U(x_{j+1})
+=
+U(x_j)+hU'(x_j)+\frac{h^2}{2}U''(x_j)+\frac{h^3}{6}U^{(3)}(x_j)+\frac{h^4}{24}U^{(4)}(\xi_j^+),
+\]
+\[
+U(x_{j-1})
+=
+U(x_j)-hU'(x_j)+\frac{h^2}{2}U''(x_j)-\frac{h^3}{6}U^{(3)}(x_j)+\frac{h^4}{24}U^{(4)}(\xi_j^-),
+\]
+para ciertos \(\xi_j^\pm\) entre \(x_{j-1}\) y \(x_{j+1}\). Entonces
+\[
+\frac{U(x_{j+1})-2U(x_j)+U(x_{j-1})}{h^2}
+=
+U''(x_j)+\frac{h^2}{12}U^{(4)}(x_j)+O(h^4),
+\]
+y por lo tanto
+\[
+\zeta_j
+=
+-\frac{h^2}{12}U^{(4)}(x_j)+O(h^4).
+\]
+
+En particular, si \(U^{(4)}\) es acotada, existe una constante \(C>0\) tal que
+\[
+|\zeta_j|\le Ch^2,
+\qquad j=1,\dots,m.
+\]
+
+\paragraph{Conclusión.}
+Este método es consistente, pues
+\[
+\text{E.T.L.}\longrightarrow 0
+\qquad \text{cuando } h\to 0.
+\]
+
+\subsection{Convergencia}
+
+Definimos el error
+\[
+E_j:=U_j-U(x_j),
+\qquad j=1,\dots,m.
+\]
+Queremos probar que
+\[
+E_j\longrightarrow 0
+\qquad \text{cuando } h\to 0.
+\]
+
+Sea
+\[
+\widehat U=
+\begin{pmatrix}
+U(x_1)\\
+\vdots\\
+U(x_m)
+\end{pmatrix},
+\qquad
+\zeta=
+\begin{pmatrix}
+\zeta_1\\
+\vdots\\
+\zeta_m
+\end{pmatrix},
+\qquad
+E=
+\begin{pmatrix}
+E_1\\
+\vdots\\
+E_m
+\end{pmatrix}.
+\]
+Entonces
+\[
+E=U-\widehat U.
+\]
+
+Como
+\[
+\zeta=A\widehat U-F,
+\]
+se obtiene
+\[
+AE=A(U-\widehat U)=AU-A\widehat U=F-(F+\zeta)=-\zeta.
+\]
+Es decir,
+\[
+AE=-\zeta.
+\]
+
+Para enfatizar la dependencia en \(h\), escribimos
+\[
+A^hE^h=-\zeta^h,
+\]
+y por tanto
+\[
+E^h=-(A^h)^{-1}\zeta^h.
+\]
+Luego,
+\[
+\|E^h\|
+\le
+\|(A^h)^{-1}\|\,\|\zeta^h\|.
+\]
+
+Sabemos que
+\[
+\|\zeta^h\|\le C_L h^2.
+\]
+Para obtener convergencia, basta tener una cota uniforme
+\[
+\|(A^h)^{-1}\|\le C_S,
+\qquad \forall\, h\le h_0.
+\]
+En ese caso,
+\[
+\|E^h\|
+\le
+C_SC_L\,h^2.
+\]
+
+\paragraph{Conclusión.}
+Si \(\|(A^h)^{-1}\|\) permanece uniformemente acotada, entonces el método es convergente.
+
+\subsection{Estabilidad del método}
+
+Diremos que el método es estable si existe \(C_S>0\) tal que
+\[
+\|(A^h)^{-1}\|\le C_S,
+\qquad \forall\, h\le h_0.
+\]
+
+Así, estabilidad \(+\) consistencia implica convergencia.
+
+\subsection{Normas matriciales}
+
+Usaremos las normas matriciales
+\[
+\|A\|_\infty=\max_{1\le i\le n}\sum_{j=1}^n |a_{ij}|,
+\]
+\[
+\|A\|_1=\max_{1\le j\le n}\sum_{i=1}^n |a_{ij}|,
+\]
+y
+\[
+\|A\|_2=\sqrt{\max\{\lambda:\ \lambda\in\sigma(A^TA)\}}.
+\]
+
+Si \(A\) es simétrica, entonces \(A^T=A\), de modo que
+\[
+\sigma(A^TA)=\sigma(A^2).
+\]
+Además, si \(\lambda\in\sigma(A)\), entonces \(\lambda^2\in\sigma(A^2)\). Por ello,
+\[
+\|A\|_2=\max_{\lambda\in\sigma(A)}|\lambda|.
+\]
+
+En consecuencia, si \(A\) es invertible y simétrica,
+\[
+\|A^{-1}\|_2
+=
+\max_{\lambda\in\sigma(A^{-1})}|\lambda|
+=
+\max_{\lambda\in\sigma(A)}\left|\frac{1}{\lambda}\right|
+=
+\frac{1}{\min_{\lambda\in\sigma(A)}|\lambda|}.
+\]
+
+\subsection{Valores propios de \(A^h\)}
+
+Recordemos que
+\[
+A^h=\frac{1}{h^2}
+\begin{pmatrix}
+2 & -1 & 0 & \cdots & 0\\
+-1 & 2 & -1 & \ddots & \vdots\\
+0 & -1 & 2 & \ddots & 0\\
+\vdots & \ddots & \ddots & \ddots & -1\\
+0 & \cdots & 0 & -1 & 2
+\end{pmatrix}.
+\]
+
+Para \(p=1,\dots,m\), definimos el vector
+\[
+\mu_p=
+\begin{pmatrix}
+\sin(p\pi h)\\
+\sin(2p\pi h)\\
+\vdots\\
+\sin(mp\pi h)
+\end{pmatrix}.
+\]
+
+Entonces
+\[
+A^h\mu_p=\lambda_p\mu_p,
+\qquad p=1,\dots,m,
+\]
+con
+\[
+\lambda_p
+=
+\frac{2}{h^2}\bigl(1-\cos(p\pi h)\bigr).
+\]
+
+Usando
+\[
+\cos(p\pi h)=1-\frac{(p\pi h)^2}{2}+\frac{(p\pi h)^4}{24}+O(h^6),
+\]
+se obtiene
+\[
+\lambda_p
+=
+\frac{2}{h^2}\left(\frac{(p\pi h)^2}{2}+O(h^4)\right)
+=
+(p\pi)^2+O(h^2).
+\]
+
+En particular, para \(h\) suficientemente pequeño,
+\[
+\min_{1\le p\le m}\lambda_p=\lambda_1>\frac{\pi^2}{2}.
+\]
+
+Por lo tanto,
+\[
+\|(A^h)^{-1}\|_2
+=
+\frac{1}{\min_{\lambda\in\sigma(A^h)}|\lambda|}
+=
+\frac{1}{\lambda_1}
+<
+\frac{2}{\pi^2},
+\qquad \forall\, h\le h_0.
+\]
+
+\paragraph{Conclusión.}
+El método es estable.
+
+\subsection{Conclusión final}
+
+Como
+\[
+|\zeta_j|\le Ch^2,
+\]
+el método es consistente. Además,
+\[
+\|(A^h)^{-1}\|_2\le C_S,
+\qquad \forall\, h\le h_0,
+\]
+luego el método es estable. Por consiguiente,
+\[
+\|E^h\|\le C_S C_L h^2,
+\]
+y entonces
+\[
+E_j\longrightarrow 0
+\qquad \text{cuando } h\to 0.
+\]
+
+\paragraph{Resumen.}
+El método es estable, consistente y, por lo tanto, convergente.
